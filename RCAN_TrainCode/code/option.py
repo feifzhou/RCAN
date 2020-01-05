@@ -2,6 +2,10 @@ import argparse
 import template
 
 parser = argparse.ArgumentParser(description='EDSR and MDSR')
+parser.add_argument('--data_range', type=str, default='1-800/801-810',
+                    help='train/test data range')
+parser.add_argument('--no_augment', action='store_true',
+                    help='do not use data augmentation')
 
 parser.add_argument('--debug', action='store_true',
                     help='Enables debug mode')
