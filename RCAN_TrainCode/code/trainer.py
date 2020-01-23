@@ -7,10 +7,12 @@ import utility
 import torch
 from torch.autograd import Variable
 from tqdm import tqdm
+import numpy as np
 
 class Trainer():
     def __init__(self, args, loader, my_model, my_loss, ckp):
         self.args = args
+        self.dim = args.dim
         self.scale = args.scale
 
         self.ckp = ckp
@@ -87,14 +89,15 @@ class Trainer():
                 tqdm_test = tqdm(self.loader_test, ncols=80)
                 for idx_img, (lr, hr, filename) in enumerate(tqdm_test):
                     filename = filename[0]
-                    no_eval = (hr.nelement() == 1)
+                    no_eval = (hr.nelement() == 1) or (self.dim!=2)
                     if not no_eval:
                         lr, hr = self.prepare([lr, hr])
                     else:
                         lr = self.prepare([lr])[0]
 
                     sr = self.model(lr, idx_scale)
-                    sr = utility.quantize(sr, self.args.rgb_range)
+                    if self.dim == 2:
+                        sr = utility.quantize(sr, self.args.rgb_range)
 
                     save_list = [sr]
                     if not no_eval:
@@ -102,7 +105,7 @@ class Trainer():
                             sr, hr, scale, self.args.rgb_range,
                             benchmark=self.loader_test.dataset.benchmark
                         )
-                        save_list.extend([lr, hr])
+                    save_list.extend([lr, hr])
 
                     if self.args.save_results:
                         self.ckp.save_results(filename, save_list, scale)

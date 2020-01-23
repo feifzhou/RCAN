@@ -40,6 +40,7 @@ class timer():
 
 class checkpoint():
     def __init__(self, args):
+        self.dim = args.dim
         self.args = args
         self.ok = True
         self.log = torch.Tensor()
@@ -80,8 +81,9 @@ class checkpoint():
         trainer.loss.save(self.dir)
         trainer.loss.plot_loss(self.dir, epoch)
 
-        self.plot_psnr(epoch)
-        torch.save(self.log, os.path.join(self.dir, 'psnr_log.pt'))
+        if self.dim == 2:
+            self.plot_psnr(epoch)
+            torch.save(self.log, os.path.join(self.dir, 'psnr_log.pt'))
         torch.save(
             trainer.optimizer.state_dict(),
             os.path.join(self.dir, 'optimizer.pt')
@@ -121,10 +123,25 @@ class checkpoint():
     def save_results(self, filename, save_list, scale):
         filename = '{}/results/{}_x{}_'.format(self.dir, filename, scale)
         postfix = ('SR', 'LR', 'HR')
-        for v, p in zip(save_list, postfix):
-            normalized = v[0].data.mul(255 / self.args.rgb_range)
-            ndarr = normalized.byte().permute(1, 2, 0).cpu().numpy()
-            misc.imsave('{}{}.png'.format(filename, p), ndarr)
+        if self.dim == 2:
+            for v, p in zip(save_list, postfix):
+                normalized = v[0].data.mul(255 / self.args.rgb_range)
+                ndarr = normalized.byte().permute(1, 2, 0).cpu().numpy()
+                misc.imsave('{}{}.png'.format(filename, p), ndarr)
+        elif self.dim == 1:
+            colors = ('r', 'k', 'b')
+            fig = plt.figure()
+            plt.title('test')
+            for v, p, color in zip(save_list, postfix, color):
+                #print('debug v p', v, p)
+                plt.plot(v[0].data.cpu().numpy().ravel(), color, label=p)
+            plt.legend()
+            plt.xlabel('Energy')
+            plt.ylabel('')
+            plt.grid(True)
+            plt.savefig('{}.pdf'.format(filename))
+            plt.close(fig)
+
 
 def quantize(img, rgb_range):
     pixel_range = 255 / rgb_range

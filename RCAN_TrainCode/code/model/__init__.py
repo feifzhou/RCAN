@@ -10,6 +10,7 @@ class Model(nn.Module):
         super(Model, self).__init__()
         print('Making model...')
 
+        self.dim= args.dim
         self.scale = args.scale
         self.idx_scale = 0
         self.self_ensemble = args.self_ensemble

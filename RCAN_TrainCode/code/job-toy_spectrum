@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+#BSUB -G ustruct
+#BSUB -q pbatch
+#BSUB -nnodes 1
+#BSUB -W 12:00
+
+
+jsrun -r 1 python main.py --dim 1 --model RCAN --save toy_spectrum --scale 1 \
+    --n_resgroups 10 --n_resblocks 20 --n_feats 64  --reset  \
+    --dir_data online --data_train toy_spectrum --data_test toy_spectrum \
+    --save_results --print_model --patch_size 384 --n_GPUs 4 \
+    --n_colors 1 --no_augment --data_range '1-6388/6389-6420' \
+    --batch_size 64 --n_threads 1 
+
+#--resume -1
+
+#--pre_train ../experiment/model/RCAN_BIX2.pt \

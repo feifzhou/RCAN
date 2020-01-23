@@ -2,6 +2,7 @@ import argparse
 import template
 
 parser = argparse.ArgumentParser(description='EDSR and MDSR')
+parser.add_argument('--dim', type=int, default=2, help='dimension (default 2d image, or 1d spectrum')
 parser.add_argument('--data_range', type=str, default='1-800/801-810',
                     help='train/test data range')
 parser.add_argument('--no_augment', action='store_true',
