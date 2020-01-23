@@ -89,8 +89,9 @@ class Model(nn.Module):
             kwargs = {}
 
         if resume == -1:
-            self.get_model().load_state_dict(
-                torch.load(
+            if os.path.exists(os.path.join(apath, 'model', 'model_latest.pt')):
+                self.get_model().load_state_dict(
+                  torch.load(
                     os.path.join(apath, 'model', 'model_latest.pt'),
                     **kwargs
                 ),

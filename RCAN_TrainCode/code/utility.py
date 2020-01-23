@@ -141,6 +141,7 @@ class checkpoint():
             plt.grid(True)
             plt.savefig('{}.pdf'.format(filename))
             plt.close(fig)
+            np.save(filename+'.npy',np.vstack([v[0].data.cpu().numpy().ravel() for v in save_list]))
 
 
 def quantize(img, rgb_range):

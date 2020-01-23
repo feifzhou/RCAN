@@ -6,7 +6,7 @@ import utility
 
 import torch
 from torch.autograd import Variable
-from tqdm import tqdm
+#from tqdm import tqdm
 import numpy as np
 
 class Trainer():
@@ -32,9 +32,10 @@ class Trainer():
         self.error_last = 1e8
 
     def train(self):
+        self.optimizer.step()
         self.scheduler.step()
         self.loss.step()
-        epoch = self.scheduler.last_epoch + 1
+        epoch = self.scheduler.last_epoch
         lr = self.scheduler.get_lr()[0]
 
         self.ckp.write_log(
@@ -76,7 +77,7 @@ class Trainer():
         self.error_last = self.loss.log[-1, -1]
 
     def test(self):
-        epoch = self.scheduler.last_epoch + 1
+        epoch = self.scheduler.last_epoch
         self.ckp.write_log('\nEvaluation:')
         self.ckp.add_log(torch.zeros(1, len(self.scale)))
         self.model.eval()
@@ -86,8 +87,9 @@ class Trainer():
             for idx_scale, scale in enumerate(self.scale):
                 eval_acc = 0
                 self.loader_test.dataset.set_scale(idx_scale)
-                tqdm_test = tqdm(self.loader_test, ncols=80)
-                for idx_img, (lr, hr, filename) in enumerate(tqdm_test):
+#                tqdm_test = tqdm(self.loader_test, ncols=80)
+#                for idx_img, (lr, hr, filename) in enumerate(tqdm_test):
+                for idx_img, (lr, hr, filename) in enumerate(self.loader_test):
                     filename = filename[0]
                     no_eval = (hr.nelement() == 1) or (self.dim!=2)
                     if not no_eval:
@@ -126,7 +128,7 @@ class Trainer():
             'Total time: {:.2f}s\n'.format(timer_test.toc()), refresh=True
         )
         if not self.args.test_only:
-            self.ckp.save(self, epoch-1, is_best=(best[1][0] + 1 == epoch))
+            self.ckp.save(self, epoch, is_best=(best[1][0] + 1 == epoch))
 
     def prepare(self, l, volatile=False):
         device = torch.device('cpu' if self.args.cpu else 'cuda')
@@ -141,6 +143,6 @@ class Trainer():
             self.test()
             return True
         else:
-            epoch = self.scheduler.last_epoch + 1
+            epoch = self.scheduler.last_epoch
             return epoch >= self.args.epochs
 

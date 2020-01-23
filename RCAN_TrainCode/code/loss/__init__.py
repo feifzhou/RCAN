@@ -112,6 +112,7 @@ class Loss(nn.modules.loss._Loss):
             plt.legend()
             plt.xlabel('Epochs')
             plt.ylabel('Loss')
+            plt.yscale('log')
             plt.grid(True)
             plt.savefig('{}/loss_{}.pdf'.format(apath, l['type']))
             plt.close(fig)

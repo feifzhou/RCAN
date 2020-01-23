@@ -5,7 +5,7 @@
 #BSUB -W 12:00
 
 
-jsrun -r 1 python main.py --dim 1 --model RCAN --scale 1 --save toy_spectrum_L1 --loss "1*L1" \
+jsrun -r 1 python main.py --dim 1 --model RCAN --scale 1 --save toy_spectrum_L2 --loss "1*MSE" \
     --n_resgroups 10 --n_resblocks 20 --n_feats 64 --resume -1 \
     --dir_data online --data_train toy_spectrum --data_test toy_spectrum \
     --save_results --print_model --patch_size 384 --n_GPUs 4 \
