@@ -132,7 +132,7 @@ class checkpoint():
             colors = ('r', 'k', 'b')
             fig = plt.figure()
             plt.title('test')
-            for v, p, color in zip(save_list, postfix, color):
+            for v, p, color in zip(save_list, postfix, colors):
                 #print('debug v p', v, p)
                 plt.plot(v[0].data.cpu().numpy().ravel(), color, label=p)
             plt.legend()
