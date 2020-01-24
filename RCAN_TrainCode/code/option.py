@@ -49,7 +49,9 @@ parser.add_argument('--patch_size', type=int, default=192,
 parser.add_argument('--rgb_range', type=int, default=255,
                     help='maximum value of RGB')
 parser.add_argument('--n_colors', type=int, default=3,
-                    help='number of color channels to use')
+                    help='number of color channels (input)')
+parser.add_argument('--n_colors_out', type=int, default=-1,
+                    help='number of color channels (output). -1 means equal to n_colors')
 parser.add_argument('--noise', type=str, default='.',
                     help='Gaussian noise std.')
 parser.add_argument('--chop', action='store_true',

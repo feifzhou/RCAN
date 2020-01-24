@@ -96,9 +96,11 @@ class RCAN(nn.Module):
         modules_body.append(conv(n_feats, n_feats, kernel_size, dim=dim))
 
         # define tail module
+        if args.n_colors_out == -1:
+            args.n_colors_out = args.n_colors
         modules_tail = [
             common.Upsampler(conv, scale, n_feats, act=False, dim=dim),
-            conv(n_feats, args.n_colors, kernel_size, dim=dim)]
+            conv(n_feats, args.n_colors_out, kernel_size, dim=dim)]
 
         self.add_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
 
