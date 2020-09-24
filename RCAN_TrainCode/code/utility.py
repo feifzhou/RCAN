@@ -129,19 +129,22 @@ class checkpoint():
                 ndarr = normalized.byte().permute(1, 2, 0).cpu().numpy()
                 misc.imsave('{}{}.png'.format(filename, p), ndarr)
         elif self.dim == 1:
-            colors = ('r', 'k', 'b')
+            #colors = ('r', 'k', 'b')
             fig = plt.figure()
             plt.title('test')
-            for v, p, color in zip(save_list, postfix, colors):
-                #print('debug v p', v, p)
-                plt.plot(v[0].data.cpu().numpy().ravel(), color, label=p)
+            npt = len(save_list[0][0].data.cpu().numpy().ravel())
+            for v, p in zip(save_list, postfix):
+                #print('debug v p', v.shape, p)
+                lines=v[0].data.cpu().numpy()
+                for j, line in enumerate(lines):
+                    plt.plot(line, label=p if j==0 else p+str(j+1))
             plt.legend()
             plt.xlabel('Energy')
             plt.ylabel('')
             plt.grid(True)
             plt.savefig('{}.pdf'.format(filename))
             plt.close(fig)
-            np.save(filename+'.npy',np.vstack([v[0].data.cpu().numpy().ravel() for v in save_list]))
+            np.save(filename+'.npy',np.vstack([v[0].data.cpu().numpy() for v in save_list]))
 
 
 def quantize(img, rgb_range):

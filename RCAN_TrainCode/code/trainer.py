@@ -107,6 +107,11 @@ class Trainer():
                             sr, hr, scale, self.args.rgb_range,
                             benchmark=self.loader_test.dataset.benchmark
                         )
+                    if self.dim != 2:
+                       eval_acc+=-np.sqrt(np.mean((hr[0].data.cpu().numpy()-sr[0].data.cpu().numpy())**2))
+                       #print('debug hr sr', hr, sr)
+                       #print(hr-sr) #(sr - hr).pow(2).mean())
+                       #eval_acc += (hr-sr).data.cpu().pow(2).mean()  #np.linalg.norm(hr[0].data.cpu().numpy()-sr[0].data.cpu().numpy())
                     save_list.extend([lr, hr])
 
                     if self.args.save_results:

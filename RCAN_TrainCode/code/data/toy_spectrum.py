@@ -18,16 +18,25 @@ class toy_spectrum(): #data.Dataset):
         self.idx_scale = 0
         self.train = train
         self.benchmark = benchmark
+        self.n_in = args.n_colors
+        self._cache = None
         data_range = [list(map(int,r.split('-'))) for r in args.data_range.split('/')]
         if self.train:
             self.length=data_range[0][1]-data_range[0][0]
+            f = os.path.join(args.dir_data, 'train.npy')
+            if os.path.exists(f):
+                self._cache = [(x[:1],x[1:]) for x in np.load(f)]
         else:
             self.length=data_range[1][1]-data_range[1][0]
-            self._cache = [generate() for i in range(self.length)]
+            f = os.path.join(args.dir_data, 'test.npy')
+            if os.path.exists(f):
+                self._cache = [(x[:1],x[1:]) for x in np.load(f)]
+            else:
+                self._cache = [generate(self.n_in) for i in range(self.length)]
 
     def __getitem__(self, idx):
-        if self.train:
-            hr, lr = generate()
+        if not self._cache:
+            hr, lr = generate(self.n_in)
         else:
             hr, lr = self._cache[idx]
         return lr, hr, str(idx)
