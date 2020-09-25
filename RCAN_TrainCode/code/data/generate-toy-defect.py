@@ -1,50 +1,4 @@
-# import os
-
-# from data import common
-
-# import numpy as np
-#import imageio
-
-#import torch
-# import torch.utils.data as data
-
-# class defect():
-#     def __init__(self, args, name='defect toy model', train=True, benchmark=False):
-#         self.args = args
-#         self.name = name
-#         self.idx_scale = 0
-#         self.train = train
-#         self.benchmark = benchmark
-#         self.n_in = args.n_colors
-#         self.n_out = args.n_colors_out
-#         self._cache = None
-#         data_range = [list(map(int,r.split('-'))) for r in args.data_range.split('/')]
-#         if self.train:
-#             self.length=data_range[0][1]-data_range[0][0]
-#             f = os.path.join(args.dir_data, 'train.npy')
-#             if os.path.exists(f):
-#                 self._cache = [(x[:1],x[1:]) for x in np.load(f)]
-#         else:
-#             self.length=data_range[1][1]-data_range[1][0]
-#             f = os.path.join(args.dir_data, 'test.npy')
-#             if os.path.exists(f):
-#                 self._cache = [(x[:1],x[1:]) for x in np.load(f)]
-#             else:
-#                 self._cache = [generate(self.n_in) for i in range(self.length)]
-
-#     def __getitem__(self, idx):
-#         if not self._cache:
-#             hr, lr = generate(self.n_in)
-#         else:
-#             hr, lr = self._cache[idx]
-#         return lr, hr, str(idx)
-
-#     def __len__(self):
-#         return self.length
-
-#     def set_scale(self, idx_scale):
-#         pass
-
+##### to use e.g. python generate-toy-defect.py  --data_size "1 5 400 400" --plot
 if __name__ == "__main__":
     import argparse
     import numpy as np
@@ -52,6 +6,7 @@ if __name__ == "__main__":
     from sklearn import metrics
     from sklearn.datasets import make_blobs
     from sklearn.preprocessing import StandardScaler
+    import scipy.ndimage
     import matplotlib.pyplot as plt
 
     parser = argparse.ArgumentParser()
@@ -59,12 +14,13 @@ if __name__ == "__main__":
     parser.add_argument("--diameter", help="diameter scaling factor. Default 1 for 512x512 images", type=float, default=1)
     parser.add_argument('--plot', action='store_true', default=False)
     parser.add_argument('-o', help='output file', default='output.npy')
+    parser.add_argument('--method', help='pixel=pixel-by-pixel, or dilation', default='pixel')
     options = parser.parse_args()
 
     def sigmoid(x):
         return 1/(1 + np.exp(-x)) 
 
-    def f(Nxy, modes, cutoff, cutoff_final):
+    def f(Nxy, modes, cutoff, cutoff_final, method='pixel'):
         xy= [np.arange(Ni) for Ni in Nxy]
         xy_grid = np.array(np.meshgrid(*xy)).transpose(np.roll(np.arange(len(xy)+1),-1))
         # print('debug xy grid', xy_grid.shape)
@@ -73,6 +29,15 @@ if __name__ == "__main__":
         vals = sigmoid(np.sum(vals, axis=1)-cutoff)
         # print('debug vals', np.array(vals).shape)
         val_out = (np.sign((np.prod(vals, axis=0, keepdims=True)-cutoff_final)*15)+1)/2
+        if method == 'pixel':
+            pass
+        elif method == 'dilation':
+            threshold = np.linspace(0.7, 0.44, len(modes))
+            mask = np.any(vals>threshold[:,None,None], axis=0)
+            val_out = scipy.ndimage.morphology.binary_dilation(val_out[0], iterations=-1, mask=mask)
+            val_out = val_out.astype(np.float32)[None,...]
+        else:
+            raise ValueError('Unknown method ' + method)
         # val_out = sigmoid((np.prod(vals, axis=0, keepdims=True)-cutoff_final)*15)
         return np.concatenate((val_out, vals), axis=0)
 
@@ -89,10 +54,10 @@ if __name__ == "__main__":
         modes=[[[np.array([np.random.uniform(0, nx) for nx in Nspace]), np.random.uniform(d1, d2)] for i in range(nmode)] for _ in range(nchannel)]
         # print('debug i', i, modes)
         print(i)
-        alldat[i]=f(Nspace, modes, 2.5, 0.002)
+        alldat[i]=f(Nspace, modes, 2.5, 0.002, method=options.method)
         if options.plot:
             for j in range(nchannel+1):
                 plt.subplot(1, nchannel+1, j+1)
                 plt.imshow(alldat[i, j])
             plt.show()
-    np.save(options.o, alldat[...,None])
+    np.save(options.o, alldat)

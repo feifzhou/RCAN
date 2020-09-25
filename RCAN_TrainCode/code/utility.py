@@ -178,7 +178,7 @@ def calc_psnr(sr, hr, scale, rgb_range, benchmark=False):
     valid = diff[:, :, shave:-shave, shave:-shave]
     mse = valid.pow(2).mean()
 
-    return -10 * math.log10(torch.nn.functional.relu(mse))
+    return -10 * math.log10(torch.nn.functional.relu(mse)+1.0e-12)
 
 def make_optimizer(args, my_model):
     trainable = filter(lambda x: x.requires_grad, my_model.parameters())
