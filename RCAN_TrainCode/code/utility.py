@@ -9,7 +9,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import numpy as np
-import scipy.misc as misc
+import imageio
 
 import torch
 import torch.optim as optim
@@ -127,7 +127,8 @@ class checkpoint():
             for v, p in zip(save_list, postfix):
                 normalized = v[0].data.mul(255 / self.args.rgb_range)
                 ndarr = normalized.byte().permute(1, 2, 0).cpu().numpy()
-                misc.imsave('{}{}.png'.format(filename, p), ndarr)
+                imageio.imwrite('{}{}.png'.format(filename, p), ndarr)
+                np.save('{}{}.png'.format(filename, p), v[0].data.cpu().numpy())
         elif self.dim == 1:
             #colors = ('r', 'k', 'b')
             fig = plt.figure()
@@ -177,7 +178,7 @@ def calc_psnr(sr, hr, scale, rgb_range, benchmark=False):
     valid = diff[:, :, shave:-shave, shave:-shave]
     mse = valid.pow(2).mean()
 
-    return -10 * math.log10(mse)
+    return -10 * math.log10(torch.nn.functional.relu(mse))
 
 def make_optimizer(args, my_model):
     trainable = filter(lambda x: x.requires_grad, my_model.parameters())

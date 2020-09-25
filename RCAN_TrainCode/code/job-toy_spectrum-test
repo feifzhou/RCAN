@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#BSUB -G ustruct
+#BSUB -q pbatch
+#BSUB -nnodes 1
+#BSUB -W 12:00
+
+
+jsrun -r 1 python main.py  --test_only --resume 0 --pre_train ../experiment/toy_spectrum_L1/model/model_best.pt \
+    --dim 1 --model RCAN --scale 1 --save toy_spectrum_L1-test --loss "1*L1" \
+    --n_resgroups 10 --n_resblocks 20 --n_feats 64 \
+    --dir_data ~/data/toy_spectrum/1source --data_train toy_spectrum --data_test toy_spectrum \
+    --save_results --print_model --patch_size 384 --n_GPUs 4 \
+    --n_colors 1 --no_augment --data_range '1-6388/6389-6420' \
+    --batch_size 256 --n_threads 1
+
+#--resume -1
+
+#--pre_train ../experiment/model/RCAN_BIX2.pt \

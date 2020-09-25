@@ -37,6 +37,10 @@ class Loss(nn.modules.loss._Loss):
                     args,
                     loss_type
                 )
+            elif loss_type == 'BCE':
+                loss_function = nn.BCELoss()
+            else:
+                raise ValueError('ERROR unknown loss ' + loss_type)
            
             self.loss.append({
                 'type': loss_type,

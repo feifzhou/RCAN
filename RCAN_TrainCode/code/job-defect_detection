@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+#BSUB -G ustruct
+#BSUB -q pbatch
+#BSUB -nnodes 1
+#BSUB -W 12:00
+
+
+jsrun -r 1 python main.py --dim 2 --model defect_detection --scale 1 --save defect --loss "1*BCE" \
+    --n_resgroups 1 --n_resblocks 1 --n_feats 64 --resume -1 \
+    --dir_data ~/data/defect --data_train toy_spectrum --data_test toy_spectrum \
+    --save_results --print_model --patch_size 400 --n_GPUs 4 \
+    --n_colors 4 --n_colors_out 1 --no_augment --data_range '1-350/351-400' \
+    --batch_size 16 --n_threads 1 --lr=1e-3
+
+#--resume -1
+
+#--pre_train ../experiment/model/RCAN_BIX2.pt \
