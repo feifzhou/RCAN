@@ -70,11 +70,11 @@ class Loss(nn.modules.loss._Loss):
 
         if args.load != '.': self.load(ckp.dir, cpu=args.cpu)
 
-    def forward(self, sr, hr):
+    def forward(self, ims, gen):
         losses = []
         for i, l in enumerate(self.loss):
             if l['function'] is not None:
-                loss = l['function'](sr, hr)
+                loss = l['function'](ims, gen)
                 effective_loss = l['weight'] * loss
                 losses.append(effective_loss)
                 self.log[-1, i] += effective_loss.item()
