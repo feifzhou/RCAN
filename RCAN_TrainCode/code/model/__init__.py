@@ -90,6 +90,7 @@ class Model(nn.Module):
 
         if resume == -1:
             if os.path.exists(os.path.join(apath, 'model', 'model_latest.pt')):
+                print('Loading model from', os.path.join(apath, 'model', 'model_latest.pt'))
                 self.get_model().load_state_dict(
                   torch.load(
                     os.path.join(apath, 'model', 'model_latest.pt'),

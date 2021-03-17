@@ -23,7 +23,8 @@ class Trainer():
         self.optimizer = utility.make_optimizer(args, self.model)
         self.scheduler = utility.make_scheduler(args, self.optimizer)
 
-        if self.args.load != '.':
+        if (self.args.load != '.' or self.args.resume == -1) and os.path.exists(os.path.join(ckp.dir, 'optimizer.pt')):
+            print('Loading optimizer from', os.path.join(ckp.dir, 'optimizer.pt'))
             self.optimizer.load_state_dict(
                 torch.load(os.path.join(ckp.dir, 'optimizer.pt'))
             )
