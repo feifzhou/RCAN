@@ -5,12 +5,12 @@
 #BSUB -W 12:00
 
 
-jsrun -r 1 python main.py --dim 2 --model defect_detection --scale 1 --save defect_supervised --loss "1*BCE" \
+jsrun -r 1 python main.py --dim 2 --model defect_detection --scale 1 --save defect_supervised --loss "1*BCEWithLogitsLoss1" \
     --n_resgroups 1 --n_resblocks 1 --n_feats 64 --resume=-1 \
     --dir_data ~/lassen-space/X-ray-defects/supervised/reddot/ --data_train toy_spectrum --data_test toy_spectrum \
-    --print_model --patch_size 984 --n_GPUs 4 --print_every=2 \
+    --print_model --n_GPUs 4 --print_every=2 \
     --n_colors 1 --n_colors_out 1 --no_augment --data_range '0-168/168-178' \
-    --batch_size 8 --n_threads 1 --lr=1e-3 --lr_decay=260
+    --batch_size 8 --n_threads 1 --lr=1e-3 --lr_decay=1000
 
 #--save_results --test_only
 

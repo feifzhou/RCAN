@@ -39,6 +39,10 @@ class Loss(nn.modules.loss._Loss):
                 )
             elif loss_type == 'BCE':
                 loss_function = nn.BCELoss()
+            elif loss_type.startswith('BCEWithLogitsLoss'):
+                pos_wt = loss_type.replace('BCEWithLogitsLoss','')
+                pos_wt = torch.Tensor([float(pos_wt)]) if pos_wt else None
+                loss_function = nn.BCEWithLogitsLoss(pos_weight=pos_wt)
             else:
                 raise ValueError('ERROR unknown loss ' + loss_type)
            

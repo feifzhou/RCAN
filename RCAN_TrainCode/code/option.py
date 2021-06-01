@@ -84,7 +84,7 @@ parser.add_argument('--reset', action='store_true',
                     help='reset the training')
 parser.add_argument('--test_every', type=int, default=1000,
                     help='do test per every N batches')
-parser.add_argument('--epochs', type=int, default=1000,
+parser.add_argument('--epochs', type=int, default=10000,
                     help='number of epochs to train')
 parser.add_argument('--batch_size', type=int, default=16,
                     help='input batch size for training')
@@ -150,9 +150,10 @@ parser.add_argument('--reduction', type=int, default=16,
 # options for test
 parser.add_argument('--testpath', type=str, default='../test/DIV2K_val_LR_our',
                     help='dataset directory for testing')
-parser.add_argument('--testset', type=str, default='Set5',
+parser.add_argument('--testset', type=str, default='test.npy',
                     help='dataset name for testing')
-
+parser.add_argument('--testfunc', type=str, default='PSNR',
+                    help='function used for evaluation')
 args = parser.parse_args()
 template.set_template(args)
 

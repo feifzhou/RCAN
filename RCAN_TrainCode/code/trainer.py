@@ -104,10 +104,19 @@ class Trainer():
 
                     save_list = [sr]
                     if not no_eval:
-                        eval_acc += utility.calc_psnr(
-                            sr, hr, scale, self.args.rgb_range,
-                            benchmark=self.loader_test.dataset.benchmark
-                        )
+                        if self.args.testfunc == 'PSNR':
+                            eval_results = utility.calc_psnr(
+                                sr, hr, scale, self.args.rgb_range,
+                                benchmark=self.loader_test.dataset.benchmark
+                            )
+                        elif self.args.testfunc == 'mse':
+                            eval_results = -torch.nn.functional.mse_loss(sr, hr)
+                        elif self.args.testfunc == 'accuracy':
+                            eval_results = 1-torch.nn.functional.l1_loss((sr>0).float(), hr)
+                        else:
+                            print('Unknown function for testing', self.args.testfunc)
+                            eval_results = 0
+                        eval_acc += eval_results
                     if self.dim != 2:
                        eval_acc+=-np.sqrt(np.mean((hr[0].data.cpu().numpy()-sr[0].data.cpu().numpy())**2))
                        #print('debug hr sr', hr, sr)
@@ -121,9 +130,10 @@ class Trainer():
                 self.ckp.log[-1, idx_scale] = eval_acc / len(self.loader_test)
                 best = self.ckp.log.max(0)
                 self.ckp.write_log(
-                    '[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})'.format(
+                    '[{} x{}]\t{}: {:.4f} (Best: {:.4f} @epoch {})'.format(
                         self.args.data_test,
                         scale,
+                        self.args.testfunc,
                         self.ckp.log[-1, idx_scale],
                         best[0][idx_scale],
                         best[1][idx_scale] + 1

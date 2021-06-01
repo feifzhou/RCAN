@@ -28,7 +28,7 @@ class toy_spectrum(): #data.Dataset):
                 self._cache = [(x[:1],x[1:]) for x in np.load(f)]
         else:
             self.length=data_range[1][1]-data_range[1][0]
-            f = os.path.join(args.dir_data, 'test.npy')
+            f = os.path.join(args.dir_data, args.testset)
             if os.path.exists(f):
                 self._cache = [(x[:1],x[1:]) for x in np.load(f)]
             else:
